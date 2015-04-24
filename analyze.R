@@ -104,13 +104,6 @@ wordcloud(df.wordfreqs$word,df.wordfreqs$freq,
 # 
 # Machine learning to predict scores based on the
 # shower thought.
-# 
-# Possible questions:
-# (1) Why are the the most frequent words what they are?
-# (2) What words would you expect to be more frequent,
-# but aren't?
-# (3) Can you tell, by looking at the dataset, what
-# are the most frequent topics? And why, do you think?
 #########################################################
 
 # Data needs to be in the right shape.
