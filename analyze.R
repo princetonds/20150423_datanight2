@@ -137,11 +137,12 @@ mape <- function(actual, predicted) {
     / length(actual))
 }
 
+###### CONTEST HERE
 # Fit a Support Vector Machine. Some example parameters given.
 # You can specify your model parameters here. See:
 # http://www.inside-r.org/node/57517
-svm.model <- svm(x, y, # <-- don't change these
-                ##### ADD/CHANGE YOUR PARAMETERS HERE
+svm.model <- svm(x, y, # <-- don't change the data!
+                ## ADD/CHANGE YOUR PARAMETERS HERE
                  kernel="linear",
                  cost=0.5,
                  epsilon=0.2)
