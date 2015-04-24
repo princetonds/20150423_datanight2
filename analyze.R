@@ -170,7 +170,7 @@ print(sprintf("Testing accuracy (by MAPE): %.3f",
 ## install.packages("ngram") # if you haven't already
 
 all.text <- paste(df.raw$title, collapse=' ')
-ngram.model <- ngram(all.text, n=3)
+ngram.model <- ngram(all.text, n=4)
 shower.thought.length <- 20
 print(sprintf("Just had a shower thought: %s.", 
   babble(ngram.model, shower.thought.length)))
