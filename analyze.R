@@ -2,6 +2,12 @@
 # Data@Night #2, Princeton Data Science
 # Analyze Reddit Shower Thoughts data.
 # 
+# Coded by echow@princeton.edu for Data@Night #2, 4/24/15.
+# 
+#########################################################
+
+#########################################################
+# Section 0: import packages
 # 
 #########################################################
 
@@ -17,10 +23,10 @@ set.seed(42)
 # We import the 3rd-party packages with various tools we need.
 # "data.table" : a package 
 lapply(c("ggplot2", "gridExtra", "wordcloud", "tm",
-         "RColorBrewer", "e1071"), require, character.only=T)
+         "RColorBrewer", "e1071", "ngram"), require, character.only=T)
 
 #########################################################
-# Read in the data, little bit of preprocessing.
+# Section 1: read in data, some preprocessing
 #
 #########################################################
 
@@ -29,7 +35,8 @@ df.raw$created_utc <- as.POSIXct(df.raw$created_utc,
                                  origin="1970-01-01 00:00.00 UTC")
 
 #########################################################
-# Exploratory analysis of the metrics.
+# Section 2: exploring the numbers
+# 
 # Possible questions:
 # (1) What explains the shape of these graph(s)?
 # (2) What explains differences between these graphs(s)?
@@ -63,6 +70,8 @@ plt.comments <- qplot(df.raw$num_comments) +
 grid.arrange(plt.score, plt.comments, plt.ups, plt.downs, ncol=2)
 
 #########################################################
+# Section 3: exploring the words
+# 
 # Exploratory analysis of the most frequent words (TF-IDF)
 # with a wordcloud. I recommend comparing this with 
 # the original data.
@@ -76,20 +85,25 @@ grid.arrange(plt.score, plt.comments, plt.ups, plt.downs, ncol=2)
 #########################################################
 
 corpus <- Corpus(VectorSource(df.raw$title))
-corpus <- tm_map(corpus, function(x) removeWords(x, stopwords("english")))
-corpus.mat <- as.matrix(TermDocumentMatrix(corpus, control=list(weighting=weightTfIdf)))
+corpus <- tm_map(corpus, 
+  function(x) removeWords(x, stopwords("english")))
+corpus.mat <- as.matrix(TermDocumentMatrix(corpus, 
+  control=list(weighting=weightTfIdf)))
 v <- sort(rowSums(corpus.mat), decreasing=TRUE)
 df.wordfreqs <- data.frame(word=names(v), freq=v)
 df.wordfreqs <- df.wordfreqs[1:300,] # truncate
 pal <- brewer.pal(8, "PuBuGn")[-(1:2)]
 # plot takes a while to load, so keep it commented when don't need it
 # Note minimum word frequency is 2. What happens if you change it?
-wordcloud(df.wordfreqs$word,df.wordfreqs$freq, scale=c(3,.3),min.freq=2,max.words=Inf, random.order=F, rot.per=.15, colors=pal)
+wordcloud(df.wordfreqs$word,df.wordfreqs$freq, 
+  scale=c(3,.3), min.freq=2,
+  max.words=Inf, random.order=F, rot.per=.15, colors=pal)
 
 #########################################################
-# Time for some analysis! 
-# with a wordcloud. I recommend comparing this with 
-# the original data.
+# Section 4: some machine learning, and a contest
+# 
+# Machine learning to predict scores based on the
+# shower thought.
 # 
 # Possible questions:
 # (1) Why are the the most frequent words what they are?
@@ -110,7 +124,8 @@ y <- df.raw$score
 
 # Set up train, test sets for x and y.
 # Train/test ratio is 80%/20%.
-train.ixs <- sample(1:nrow(x), ceiling(nrow(x)*4/5), replace=FALSE)
+train.ixs <- sample(1:nrow(x), 
+  ceiling(nrow(x)*4/5), replace=FALSE)
 x.train <- x[train.ixs,]
 y.train <- y[train.ixs]
 x.test <- x[-train.ixs,]
@@ -118,13 +133,15 @@ y.test <- y[-train.ixs]
 
 # Function to calculate Mean Absolute Percentage Error (MAPE).
 mape <- function(actual, predicted) {
-  return(sum(abs((actual - predicted) / actual)) / length(actual))
+  return(sum(abs((actual - predicted) / actual)) 
+    / length(actual))
 }
 
 # Fit a Support Vector Machine. Some example parameters given.
 # You can specify your model parameters here. See:
 # http://www.inside-r.org/node/57517
 svm.model <- svm(x, y, # <-- don't change these
+                ##### ADD/CHANGE YOUR PARAMETERS HERE
                  kernel="linear",
                  cost=0.5,
                  epsilon=0.2)
@@ -135,21 +152,25 @@ svm.model <- svm(x, y, # <-- don't change these
 # get on the testing set?
 train.preds <- predict(svm.model, x.train)
 test.preds <- predict(svm.model, x.test)
-print(sprintf("Training accurracy (by MAPE): %.3f", 1 - mape(train.preds, y.train)))
-print(sprintf("Testing accuracy (by MAPE): %.3f", 1 - mape(test.preds, y.test)))
+print(sprintf("Training accurracy (by MAPE): %.3f", 
+  1 - mape(train.preds, y.train)))
+print(sprintf("Testing accuracy (by MAPE): %.3f", 
+  1 - mape(test.preds, y.test)))
 
 
 #########################################################
+# Section 5: some extra fun with text generation
+# 
 # EXTRA FUN: generate new random "shower thoughts"!
 # First, we concatenate all the shower thoughts into 
 # one giant text string. Then we use the "ngram" package
 # to randomly generate new shower thoughts!
 #########################################################
 
-# install.packages("ngram") # if you haven't already
+## install.packages("ngram") # if you haven't already
 
-# require(ngram)
-# all.text <- paste(df.raw$title, collapse=' ')
-# ngram.model <- ngram(all.text, n=3)
-# shower.thought.length <- 20
-# print(sprintf("Just had a shower thought: %s.", babble(ngram.model, shower.thought.length)))
+all.text <- paste(df.raw$title, collapse=' ')
+ngram.model <- ngram(all.text, n=3)
+shower.thought.length <- 20
+print(sprintf("Just had a shower thought: %s.", 
+  babble(ngram.model, shower.thought.length)))
