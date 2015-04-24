@@ -12,7 +12,7 @@ set.seed(42)
 # to run various commands.)
 # THE COMMAND:
 # install.packages(c("ggplot2", "gridExtra", "wordcloud", "tm",
-#                    "RColorBrewer", "e1071"))
+#                    "RColorBrewer", "e1071", "ngram"))
 
 # We import the 3rd-party packages with various tools we need.
 # "data.table" : a package 
@@ -148,8 +148,8 @@ print(sprintf("Testing accuracy (by MAPE): %.3f", 1 - mape(test.preds, y.test)))
 
 # install.packages("ngram") # if you haven't already
 
-require(ngram)
-all.text <- paste(df.raw$title, collapse=' ')
-ngram.model <- ngram(all.text, n=3)
-shower.thought.length <- 20
-print(sprintf("Just had a shower thought: %s.", babble(ngram.model, shower.thought.length)))
+# require(ngram)
+# all.text <- paste(df.raw$title, collapse=' ')
+# ngram.model <- ngram(all.text, n=3)
+# shower.thought.length <- 20
+# print(sprintf("Just had a shower thought: %s.", babble(ngram.model, shower.thought.length)))
