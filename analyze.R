@@ -151,7 +151,6 @@ print(sprintf("Training accurracy (by MAPE): %.3f",
 print(sprintf("Testing accuracy (by MAPE): %.3f", 
   1 - mape(test.preds, y.test)))
 
-
 #########################################################
 # Section 5: some extra fun with text generation
 # 
